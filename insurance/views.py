@@ -3,6 +3,10 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
+from .models import Policy, Claim
+from .serializers import PloicySerializer, ClaimSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
 
 @api_view(['POST'])
@@ -28,3 +32,26 @@ def get_tokens(request):
             'access' : str(refresh.access_token),
         })
     return Response({"error" : "Invalid credentials "}, status=401)
+
+
+
+
+class PolicyListCreate(ListCreateAPIView):
+    queryset = Policy.objects.all()
+    serializer_class = PloicySerializer
+    permission_classes = [IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+        
+        
+class PolicyDetail(RetrieveUpdateDestroyAPIView):
+    queryset = Policy.objects.all()
+    serializer_class = PloicySerializer
+    permission_classes = [IsAuthenticated]
+    
+    
+class ClaimCreate(ListCreateAPIView):
+    queryset = Claim.objects.all()
+    serializer_class = ClaimSerializer
+    permission_classes = [IsAuthenticated]
